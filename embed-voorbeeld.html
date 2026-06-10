@@ -1,0 +1,52 @@
+<!--
+  Invalcheck embedden op www.hilverhockey.nl
+  ============================================
+
+  De site draait op Duda. Voeg in de editor een "HTML"-widget (Insert HTML /
+  Embed code) toe op de gewenste pagina en plak daar het blok hieronder in.
+
+  Vervang VOORBEELD-URL door de echte locatie van inval.php, bijv.
+  https://jouwdomein.nl/hockey-iframe/inval.php?embed=1
+
+  Het script luistert naar hoogte-berichten van het iframe, zodat het iframe
+  meegroeit met de inhoud (formulier uitklappen, oordeel tonen) en er nooit
+  een scrollbalk verschijnt — daardoor oogt het als onderdeel van de pagina.
+-->
+
+<iframe
+  id="invalcheck"
+  src="https://VOORBEELD-URL/hockey-iframe/inval.php?embed=1"
+  style="width:100%;border:0;display:block;height:420px"
+  title="Invalcheck HC Hilvarenbeek"
+  loading="lazy"></iframe>
+
+<script>
+  window.addEventListener('message', function (e) {
+    if (e.data && e.data.type === 'invalcheck:height') {
+      document.getElementById('invalcheck').style.height = e.data.height + 'px';
+    }
+  });
+</script>
+
+<!--
+  Kampioenscheck embedden (zelfde aanpak, eigen pagina)
+  =====================================================
+  kampioen-embed.php is altijd embed-stijl (geen ?embed=1 nodig):
+  kies veld of zaal, dan een team, en zie of dat team nog kampioen
+  kan worden. Plak dit blok in een aparte Duda HTML-widget.
+-->
+
+<iframe
+  id="kampioenscheck"
+  src="https://VOORBEELD-URL/hockey-iframe/kampioen-embed.php"
+  style="width:100%;border:0;display:block;height:320px"
+  title="Kampioenscheck HC Hilvarenbeek"
+  loading="lazy"></iframe>
+
+<script>
+  window.addEventListener('message', function (e) {
+    if (e.data && e.data.type === 'kampioenscheck:height') {
+      document.getElementById('kampioenscheck').style.height = e.data.height + 'px';
+    }
+  });
+</script>

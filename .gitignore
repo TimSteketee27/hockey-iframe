@@ -1,0 +1,9 @@
+# API-cache en device-token (cache/hapi_device.json) — nooit committen
+cache/
+
+# Lokale Claude Code-instellingen
+.claude/settings.local.json
+
+# OS / editor
+Thumbs.db
+.DS_Store

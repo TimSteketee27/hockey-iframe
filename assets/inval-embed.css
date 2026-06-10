@@ -1,0 +1,255 @@
+/* ============================================================
+   Invalcheck — stand-alone embed voor www.hilverhockey.nl
+   Volgt het design van de clubsite (Duda-thema):
+   - koppen:  Montserrat 700
+   - tekst:   Open Sans, #313131
+   - accent:  rood #ce0000, hover donkergrijs #1c1c1c
+   - knoppen: pill-vorm (border-radius 50px), rood → donker
+   Geladen i.p.v. style.css wanneer inval.php?embed=1.
+   ============================================================ */
+
+:root {
+  --hh-red:        #ce0000;
+  --hh-red-dark:   #a50000;
+  --hh-dark:       #1c1c1c;
+  --hh-text:       #313131;
+  --hh-muted:      #626262;
+  --hh-border:     #ececec;
+  --hh-input:     #d1d1d1;
+  --hh-bg-alt:     #f7f7f7;
+  --hh-ja:         #2e7d32;
+  --hh-mits:       #b58900;
+  --hh-nee:        #c62828;
+  --hh-font-head:  'Montserrat', 'Segoe UI', sans-serif;
+  --hh-font-body:  'Open Sans', 'Segoe UI', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body.embed {
+  background: #fff;
+  font-family: var(--hh-font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--hh-text);
+  -webkit-text-size-adjust: 100%;
+}
+
+.inval-embed {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 4px 2px 16px;
+}
+
+/* ── Kop ──────────────────────────────────────────────────── */
+
+.inval-embed-head { margin-bottom: 1.4rem; }
+
+.inval-embed-head h2 {
+  font-family: var(--hh-font-head);
+  font-weight: 700;
+  font-size: 1.7rem;
+  line-height: 1.25;
+  color: var(--hh-dark);
+  margin-bottom: .4rem;
+}
+
+.inval-embed-intro {
+  color: var(--hh-muted);
+  font-size: .95rem;
+}
+
+/* ── Notices ──────────────────────────────────────────────── */
+
+.notice {
+  padding: .8rem 1rem;
+  margin-bottom: 1rem;
+  font-size: .9rem;
+  color: var(--hh-muted);
+  background: var(--hh-bg-alt);
+  border-left: 4px solid var(--hh-input);
+}
+
+.notice-error {
+  color: #721c24;
+  background: #fdecea;
+  border-left-color: var(--hh-nee);
+}
+
+.notice a { color: inherit; }
+
+/* ── Formulier ────────────────────────────────────────────── */
+
+.inval-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.inval-row label { flex: 1 1 240px; display: flex; flex-direction: column; gap: .35rem; }
+
+.inval-row label span {
+  font-family: var(--hh-font-head);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--hh-dark);
+}
+
+.inval-form select {
+  font: inherit;
+  font-size: .92rem;
+  color: var(--hh-text);
+  padding: .55rem .7rem;
+  border: 1px solid var(--hh-input);
+  border-radius: 4px;
+  background: #fff;
+  max-width: 100%;
+}
+
+.inval-form select:focus,
+.inval-form input:focus {
+  outline: 2px solid color-mix(in srgb, var(--hh-red) 40%, white);
+  outline-offset: 1px;
+  border-color: var(--hh-red);
+}
+
+.inval-extra { margin: .25rem 0 1.1rem; }
+
+.inval-extra summary {
+  cursor: pointer;
+  font-size: .88rem;
+  color: var(--hh-red);
+  font-weight: 600;
+  padding: .25rem 0;
+}
+
+.inval-extra summary:hover { color: var(--hh-dark); }
+
+.inval-extra[open] {
+  background: var(--hh-bg-alt);
+  border: 1px solid var(--hh-border);
+  border-radius: 6px;
+  padding: .6rem .9rem .8rem;
+}
+
+.inval-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: .7rem 1.1rem;
+  padding: .6rem 0 .2rem;
+}
+
+.inval-grid label { display: flex; flex-direction: column; gap: .3rem; }
+.inval-grid label span { font-size: .84rem; color: var(--hh-text); }
+
+.inval-grid input[type=checkbox] {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: var(--hh-red);
+}
+
+/* Pill-knop zoals op de clubsite: rood, hover donkergrijs */
+.inval-submit {
+  display: inline-block;
+  padding: .7rem 2.4rem;
+  background: var(--hh-red);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-family: var(--hh-font-head);
+  font-size: .9rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  cursor: pointer;
+  transition: background .2s;
+}
+
+.inval-submit:hover { background: var(--hh-dark); }
+
+/* ── Oordeel ──────────────────────────────────────────────── */
+
+.verdict-card {
+  margin: 1.4rem 0 1rem;
+  background: #fff;
+  border: 1px solid var(--hh-border);
+  border-left: 4px solid var(--hh-muted);
+  border-radius: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
+  padding: 1.1rem 1.2rem;
+}
+
+.verdict-ja       { border-left-color: var(--hh-ja); }
+.verdict-mits     { border-left-color: var(--hh-mits); }
+.verdict-nee      { border-left-color: var(--hh-nee); }
+.verdict-onbekend { border-left-color: var(--hh-muted); }
+.verdict-mogelijk { border-left-color: #1565c0; }  /* kampioenscheck: nog mogelijk */
+
+.verdict-head { display: flex; align-items: flex-start; gap: .8rem; margin-bottom: .5rem; }
+
+.verdict-head strong {
+  font-family: var(--hh-font-head);
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: var(--hh-dark);
+}
+
+.verdict-icon {
+  flex: 0 0 auto;
+  width: 2rem; height: 2rem;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  color: #fff;
+  font-weight: 700;
+}
+
+.verdict-ja .verdict-icon       { background: var(--hh-ja); }
+.verdict-mits .verdict-icon     { background: var(--hh-mits); }
+.verdict-nee .verdict-icon      { background: var(--hh-nee); }
+.verdict-onbekend .verdict-icon { background: var(--hh-muted); }
+.verdict-mogelijk .verdict-icon { background: #1565c0; }
+
+.verdict-sub { font-size: .84rem; color: var(--hh-muted); margin-top: .15rem; }
+
+.verdict-label {
+  font-family: var(--hh-font-head);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--hh-dark);
+  margin: .8rem 0 .25rem;
+}
+
+.verdict-list { margin: .3rem 0 .3rem 1.25rem; font-size: .9rem; }
+.verdict-list li { margin-bottom: .3rem; }
+
+.verdict-refs {
+  margin-top: .8rem;
+  padding-top: .6rem;
+  border-top: 1px solid var(--hh-border);
+  font-size: .76rem;
+  color: var(--hh-muted);
+}
+
+.inval-disclaimer {
+  font-size: .8rem;
+  color: var(--hh-muted);
+}
+
+.inval-disclaimer a {
+  color: var(--hh-red);
+  text-decoration: underline;
+}
+
+.inval-disclaimer a:hover { color: var(--hh-dark); }
+
+/* ── Responsive ───────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  body.embed { font-size: 14px; }
+  .inval-embed-head h2 { font-size: 1.45rem; }
+  .inval-submit { width: 100%; text-align: center; }
+}

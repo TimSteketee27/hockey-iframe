@@ -462,13 +462,13 @@ function inval_std_warnings(array $bron, array $doel, array $warnings, ?bool $be
     return $warnings;
 }
 
-// Leesbaar niveau-label, bijv. "reserve 2e klasse, niveau 4"
+// Leesbaar klasse-label, bijv. "2e klasse"; het interne niveau-getal
+// (de rij in de Tabel Klassengrenzen) tonen we bewust niet aan de gebruiker.
 function inval_level_label(array $p): string
 {
-    $klasse = match ($p['klasse']) {
+    return match ($p['klasse']) {
         'klasse'  => ($p['klasse_n'] ?? '?') . 'e klasse',
         null      => 'klasse onbekend',
         default   => ucfirst((string)$p['klasse']),
     };
-    return $klasse . ($p['level'] !== null ? ', niveau ' . $p['level'] : '');
 }

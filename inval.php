@@ -206,6 +206,7 @@ $tabs = POULE_ID ? ['programma', 'uitslagen', 'stand'] : ['programma', 'uitslage
         </label>
       </div>
 
+      <?php if (!$embed): // tijdelijk geen extra gegevens in de embed, houdt het simpel ?>
       <details class="inval-extra" <?= $detailsOpen ? 'open' : '' ?>>
         <summary>Extra gegevens (scherpt het oordeel aan)</summary>
         <div class="inval-grid">
@@ -244,6 +245,7 @@ $tabs = POULE_ID ? ['programma', 'uitslagen', 'stand'] : ['programma', 'uitslage
       </details>
 
       <input type="hidden" name="extra" value="<?= $detailsOpen ? '1' : '0' ?>">
+      <?php endif; ?>
       <button type="submit" class="inval-submit">Check invalregels</button>
     </form>
 
@@ -254,7 +256,7 @@ $tabs = POULE_ID ? ['programma', 'uitslagen', 'stand'] : ['programma', 'uitslage
       var form = document.querySelector('.inval-form');
       var extra = form.querySelector('details.inval-extra');
       form.querySelector('.inval-submit').style.display = 'none';
-      extra.addEventListener('toggle', function () {
+      if (extra) extra.addEventListener('toggle', function () {
         form.elements.extra.value = extra.open ? '1' : '0';
       });
       form.addEventListener('change', function () {
@@ -296,7 +298,7 @@ $tabs = POULE_ID ? ['programma', 'uitslagen', 'stand'] : ['programma', 'uitslage
           </ul>
         <?php endif; ?>
 
-        <?php if ($result['refs']): ?>
+        <?php if ($result['refs'] && !$embed): ?>
           <p class="verdict-refs">Bron: <?= e(implode(' · ', array_unique($result['refs']))) ?></p>
         <?php endif; ?>
       </div>

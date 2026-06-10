@@ -1,0 +1,2 @@
+# Cachebestanden (incl. hapi_device.json met het device-token) nooit via het web serveren
+Require all denied

@@ -1,5 +1,7 @@
 # API-cache en device-token (cache/hapi_device.json) — nooit committen
-cache/
+# (alleen de .htaccess die de map afschermt gaat mee)
+cache/*
+!cache/.htaccess
 
 # Lokale Claude Code-instellingen
 .claude/settings.local.json

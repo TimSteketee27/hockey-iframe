@@ -1,0 +1,4 @@
+# setup.php toont de KNHB-clubstructuur — alleen lokaal toegankelijk
+<Files "setup.php">
+    Require local
+</Files>

@@ -368,6 +368,7 @@ function check_inval(array $bron, array $doel, array $opts = []): array
     }
 
     $diff = $doel['level'] - $bron['level']; // > 0: doel speelt lager dan bron
+    $uitleg = inval_tabel_uitleg($bron, $doel);
 
     // 8. Specifieke matrices (art. 5.3.5.3–5.3.5.5): alleen zijwaarts of omhoog
     $matrix =
@@ -379,16 +380,22 @@ function check_inval(array $bron, array $doel, array $opts = []): array
         $ref = $bron['kind'] === 'junior' ? 'BR art. 5.3.5.3'
              : ($bron['kind'] === 'reserve' ? 'BR art. 5.3.5.4' : 'BR art. 5.3.5.5');
         if ($diff > 0) {
-            return $nee(
-                sprintf('%s speelt op een hoger niveau (%s) dan %s (%s): volgens de tabel in het reglement mag een speler uit %s alleen invallen in teams die op gelijk of hoger niveau spelen.',
+            $res = $nee(
+                sprintf('%s (%s) speelt op een hoger niveau dan %s (%s): volgens het reglement mag een speler uit %s alleen invallen in teams die op gelijk of hoger niveau spelen.',
                     $bron['name'], inval_level_label($bron), $doel['name'], inval_level_label($doel), $bron['name']),
                 $ref
             );
+            if ($uitleg) $res['reasons'][] = $uitleg;
+            return $res;
         }
         $refs[] = $ref;
+        $reden = $diff === 0
+            ? sprintf('%s (%s) en %s (%s) spelen op gelijk niveau; invallen is dan toegestaan.',
+                $bron['name'], inval_level_label($bron), $doel['name'], inval_level_label($doel))
+            : sprintf('%s (%s) speelt op een lager niveau dan %s (%s); invallen is dan toegestaan.',
+                $bron['name'], inval_level_label($bron), $doel['name'], inval_level_label($doel));
         return ['verdict' => empty($conditions) ? 'ja' : 'mits',
-            'reasons' => [sprintf('%s speelt op gelijk of lager niveau (%s) dan %s (%s); invallen is dan toegestaan.',
-                $bron['name'], inval_level_label($bron), $doel['name'], inval_level_label($doel))],
+            'reasons' => array_values(array_filter([$reden, $uitleg])),
             'conditions' => $conditions, 'warnings' => inval_std_warnings($bron, $doel, $warnings, $beslissing, $refs), 'refs' => $refs];
     }
 
@@ -396,9 +403,13 @@ function check_inval(array $bron, array $doel, array $opts = []): array
     if ($diff <= 0) {
         // Bron speelt gelijk of lager: altijd toegestaan
         $refs[] = 'BR art. 5.3.5.1';
+        $reden = $diff === 0
+            ? sprintf('%s (%s) en %s (%s) spelen op gelijk niveau; een team mag altijd invallers lenen uit een gelijk of lager spelend team.',
+                $bron['name'], inval_level_label($bron), $doel['name'], inval_level_label($doel))
+            : sprintf('%s (%s) speelt op een lager niveau dan %s (%s); een team mag altijd invallers lenen uit een gelijk of lager spelend team.',
+                $bron['name'], inval_level_label($bron), $doel['name'], inval_level_label($doel));
         return ['verdict' => empty($conditions) ? 'ja' : 'mits',
-            'reasons' => [sprintf('%s (%s) speelt op gelijk of lager niveau dan %s (%s); een team mag altijd invallers lenen uit een gelijk of lager spelend team.',
-                $bron['name'], inval_level_label($bron), $doel['name'], inval_level_label($doel))],
+            'reasons' => array_values(array_filter([$reden, $uitleg])),
             'conditions' => $conditions, 'warnings' => inval_std_warnings($bron, $doel, $warnings, $beslissing, $refs), 'refs' => $refs];
     }
 
@@ -428,16 +439,18 @@ function check_inval(array $bron, array $doel, array $opts = []): array
             ? sprintf('Beide teams spelen in de junioren 4e klasse of lager; daar mag onderling worden ingevallen, mits aan de voorwaarden is voldaan.')
             : sprintf('%s (%s) speelt één klasse hoger dan %s (%s); lenen uit een hoger spelend team mag alleen onder voorwaarden.',
                 $bron['name'], inval_level_label($bron), $doel['name'], inval_level_label($doel));
-        return ['verdict' => 'mits', 'reasons' => [$reason],
+        return ['verdict' => 'mits', 'reasons' => array_values(array_filter([$reason, $uitleg])),
             'conditions' => $conditions,
             'warnings' => inval_std_warnings($bron, $doel, $warnings, $beslissing, $refs), 'refs' => $refs];
     }
 
-    return $nee(
+    $res = $nee(
         sprintf('%s (%s) speelt meer dan één klasse hoger dan %s (%s); invallen is dan niet toegestaan (ook niet met weinig spelers).',
             $bron['name'], inval_level_label($bron), $doel['name'], inval_level_label($doel)),
         'BR art. 5.3.5.2'
     );
+    if ($uitleg) $res['reasons'][] = $uitleg;
+    return $res;
 }
 
 // Standaard-waarschuwingen die bij elk positief oordeel horen
@@ -471,4 +484,51 @@ function inval_level_label(array $p): string
         null      => 'klasse onbekend',
         default   => ucfirst((string)$p['klasse']),
     };
+}
+
+// Kolom in de Tabel Klassengrenzen waar dit team onder valt, bijv. "O14",
+// "senioren" of "30+". Klassenummers zijn alleen binnen dezelfde kolom
+// direct vergelijkbaar; tussen kolommen vergelijkt de tabel rij voor rij.
+function inval_tabel_kolom(array $p): string
+{
+    return match ($p['kind']) {
+        'junior'               => strtoupper($p['age']),
+        'reserve', 'standaard' => 'senioren',
+        'o25'                  => 'O25',
+        '30plus'               => '30+',
+        '45plus'               => '45+',
+        default                => $p['kind'],
+    };
+}
+
+/**
+ * Extra uitlegzin voor oordelen waarbij bron en doel in verschillende
+ * kolommen van de Tabel Klassengrenzen vallen (andere leeftijdscategorie of
+ * teamsoort). Een 2e klasse O14 kan dan gelijk staan aan een 4e klasse O18;
+ * zonder deze zin lijkt de niveauvergelijking voor de lezer tegenstrijdig.
+ * Geeft null binnen dezelfde kolom of als een niveau onbekend is.
+ */
+function inval_tabel_uitleg(array $bron, array $doel): ?string
+{
+    if ($bron['level'] === null || $doel['level'] === null) return null;
+    $kolomBron = inval_tabel_kolom($bron);
+    $kolomDoel = inval_tabel_kolom($doel);
+    if ($kolomBron === $kolomDoel) return null;
+
+    $diff    = $bron['level'] - $doel['level']; // > 0: bron speelt lager
+    $tellen  = [1 => 'één', 2 => 'twee', 3 => 'drie', 4 => 'vier', 5 => 'vijf', 6 => 'zes'];
+    $n       = $tellen[abs($diff)] ?? (string)abs($diff);
+    $klassen = abs($diff) === 1 ? 'klasse' : 'klassen';
+    $relatie = match (true) {
+        $diff === 0 => 'op gelijke hoogte met',
+        $diff > 0   => "$n $klassen lager dan",
+        default     => "$n $klassen hoger dan",
+    };
+    $lidBron = str_contains(mb_strtolower(inval_level_label($bron)), 'klasse') ? 'de ' : '';
+    $lidDoel = str_contains(mb_strtolower(inval_level_label($doel)), 'klasse') ? 'de ' : '';
+    return sprintf(
+        'De teams spelen in verschillende leeftijdscategorieën; hun klassen zijn daarom niet één-op-één te vergelijken. '
+        . 'Volgens de Tabel Klassengrenzen veldhockey staat %s%s bij de %s %s %s%s bij de %s.',
+        $lidBron, inval_level_label($bron), $kolomBron, $relatie, $lidDoel, inval_level_label($doel), $kolomDoel
+    );
 }

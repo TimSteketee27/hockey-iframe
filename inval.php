@@ -89,6 +89,23 @@ if ($doelId !== '' && $bronId !== '' && isset($byId[$doelId], $byId[$bronId])) {
     $bronProfiel = inval_team_profile($bronTeam, $bronKlasse);
 
     $result = check_inval($bronProfiel, $doelProfiel, $opts);
+
+    // HC Hilvarenbeek-beleid: waarschuw als een jeugdinvaller meer dan twee
+    // jaarlagen omhoog gaat (KNHB staat het toe, maar de vereniging vindt het
+    // leeftijdsverschil te groot).
+    if (in_array($result['verdict'], ['ja', 'mits'], true)
+        && $bronProfiel['kind'] === 'junior'
+        && $doelProfiel['kind'] === 'junior'
+    ) {
+        $bronJaar = (int)ltrim($bronProfiel['age'], 'o');
+        $doelJaar = (int)ltrim($doelProfiel['age'], 'o');
+        if ($doelJaar - $bronJaar > 2) {
+            $result['warnings'][] = 'HC Hilvarenbeek-beleid: dit invallen mag formeel'
+                . ' volgens de KNHB-regels, maar het leeftijdsverschil van '
+                . ($doelJaar - $bronJaar) . ' jaar tussen beide teams vinden wij als'
+                . ' vereniging te groot. Stem dit altijd af met de jeugdcoördinator.';
+        }
+    }
 }
 
 function e(mixed $v): string { return htmlspecialchars((string)$v); }

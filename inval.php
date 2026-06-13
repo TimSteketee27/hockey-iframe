@@ -89,6 +89,30 @@ if ($doelId !== '' && $bronId !== '' && isset($byId[$doelId], $byId[$bronId])) {
     $bronProfiel = inval_team_profile($bronTeam, $bronKlasse);
 
     $result = check_inval($bronProfiel, $doelProfiel, $opts);
+
+    // HC Hilvarenbeek-beleid: waarschuw bij groot leeftijdsverschil bij jeugdinvallers.
+    if (in_array($result['verdict'], ['ja', 'mits'], true) && $bronProfiel['kind'] === 'junior') {
+        $bronJaar = (int)ltrim($bronProfiel['age'], 'o');
+
+        // Junior naar junior: meer dan twee jaarlagen (> 2 jaar) omhoog
+        if ($doelProfiel['kind'] === 'junior') {
+            $doelJaar = (int)ltrim($doelProfiel['age'], 'o');
+            if ($doelJaar - $bronJaar > 2) {
+                $result['warnings'][] = 'HC Hilvarenbeek-beleid: dit invallen mag formeel'
+                    . ' volgens de KNHB-regels, maar de teams liggen meer dan één'
+                    . ' leeftijdscategorie uit elkaar; dat vinden wij als vereniging te'
+                    . ' groot. Stem dit altijd af met de teamcommissie.';
+            }
+        }
+
+        // Junior naar O25/senioren: O16 en jonger vinden we te jong
+        if (in_array($doelProfiel['kind'], ['o25', 'reserve', 'standaard'], true) && $bronJaar < 18) {
+            $result['warnings'][] = 'HC Hilvarenbeek-beleid: dit invallen mag formeel'
+                . ' volgens de KNHB-regels, maar een ' . strtoupper($bronProfiel['age'])
+                . '-speler bij O25- of seniorenteams vinden wij als vereniging te jong.'
+                . ' Stem dit altijd af met de teamcommissie.';
+        }
+    }
 }
 
 function e(mixed $v): string { return htmlspecialchars((string)$v); }

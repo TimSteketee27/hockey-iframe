@@ -90,20 +90,27 @@ if ($doelId !== '' && $bronId !== '' && isset($byId[$doelId], $byId[$bronId])) {
 
     $result = check_inval($bronProfiel, $doelProfiel, $opts);
 
-    // HC Hilvarenbeek-beleid: waarschuw als een jeugdinvaller meer dan twee
-    // jaarlagen omhoog gaat (KNHB staat het toe, maar de vereniging vindt het
-    // leeftijdsverschil te groot).
-    if (in_array($result['verdict'], ['ja', 'mits'], true)
-        && $bronProfiel['kind'] === 'junior'
-        && $doelProfiel['kind'] === 'junior'
-    ) {
+    // HC Hilvarenbeek-beleid: waarschuw bij groot leeftijdsverschil bij jeugdinvallers.
+    if (in_array($result['verdict'], ['ja', 'mits'], true) && $bronProfiel['kind'] === 'junior') {
         $bronJaar = (int)ltrim($bronProfiel['age'], 'o');
-        $doelJaar = (int)ltrim($doelProfiel['age'], 'o');
-        if ($doelJaar - $bronJaar > 2) {
+
+        // Junior naar junior: meer dan twee jaarlagen (> 2 jaar) omhoog
+        if ($doelProfiel['kind'] === 'junior') {
+            $doelJaar = (int)ltrim($doelProfiel['age'], 'o');
+            if ($doelJaar - $bronJaar > 2) {
+                $result['warnings'][] = 'HC Hilvarenbeek-beleid: dit invallen mag formeel'
+                    . ' volgens de KNHB-regels, maar het leeftijdsverschil van '
+                    . ($doelJaar - $bronJaar) . ' jaar tussen beide teams vinden wij als'
+                    . ' vereniging te groot. Stem dit altijd af met de jeugdcoördinator.';
+            }
+        }
+
+        // Junior naar O25/senioren: O16 en jonger vinden we te jong
+        if (in_array($doelProfiel['kind'], ['o25', 'reserve', 'standaard'], true) && $bronJaar < 18) {
             $result['warnings'][] = 'HC Hilvarenbeek-beleid: dit invallen mag formeel'
-                . ' volgens de KNHB-regels, maar het leeftijdsverschil van '
-                . ($doelJaar - $bronJaar) . ' jaar tussen beide teams vinden wij als'
-                . ' vereniging te groot. Stem dit altijd af met de jeugdcoördinator.';
+                . ' volgens de KNHB-regels, maar een ' . strtoupper($bronProfiel['age'])
+                . '-speler bij O25- of seniorenteams vinden wij als vereniging te jong.'
+                . ' Stem dit altijd af met de jeugdcoördinator.';
         }
     }
 }

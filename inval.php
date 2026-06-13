@@ -101,7 +101,7 @@ if ($doelId !== '' && $bronId !== '' && isset($byId[$doelId], $byId[$bronId])) {
                 $result['warnings'][] = 'HC Hilvarenbeek-beleid: dit invallen mag formeel'
                     . ' volgens de KNHB-regels, maar de teams liggen meer dan één'
                     . ' leeftijdscategorie uit elkaar; dat vinden wij als vereniging te'
-                    . ' groot. Stem dit altijd af met de jeugdcoördinator.';
+                    . ' groot. Stem dit altijd af met de teamcommissie.';
             }
         }
 
@@ -110,7 +110,7 @@ if ($doelId !== '' && $bronId !== '' && isset($byId[$doelId], $byId[$bronId])) {
             $result['warnings'][] = 'HC Hilvarenbeek-beleid: dit invallen mag formeel'
                 . ' volgens de KNHB-regels, maar een ' . strtoupper($bronProfiel['age'])
                 . '-speler bij O25- of seniorenteams vinden wij als vereniging te jong.'
-                . ' Stem dit altijd af met de jeugdcoördinator.';
+                . ' Stem dit altijd af met de teamcommissie.';
         }
     }
 }

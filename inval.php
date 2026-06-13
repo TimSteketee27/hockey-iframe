@@ -99,9 +99,9 @@ if ($doelId !== '' && $bronId !== '' && isset($byId[$doelId], $byId[$bronId])) {
             $doelJaar = (int)ltrim($doelProfiel['age'], 'o');
             if ($doelJaar - $bronJaar > 2) {
                 $result['warnings'][] = 'HC Hilvarenbeek-beleid: dit invallen mag formeel'
-                    . ' volgens de KNHB-regels, maar het leeftijdsverschil van '
-                    . ($doelJaar - $bronJaar) . ' jaar tussen beide teams vinden wij als'
-                    . ' vereniging te groot. Stem dit altijd af met de jeugdcoördinator.';
+                    . ' volgens de KNHB-regels, maar de teams liggen meer dan één'
+                    . ' leeftijdscategorie uit elkaar; dat vinden wij als vereniging te'
+                    . ' groot. Stem dit altijd af met de jeugdcoördinator.';
             }
         }
 
